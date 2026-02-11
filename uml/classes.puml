@@ -1,0 +1,159 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+' =========================
+' CLEANED + CORRECTED MODEL
+' =========================
+
+package "bank.config" {
+
+  class ConnectionInstantiator <<Singleton>> {
+    - static instance : ConnectionInstantiator
+    - connection : Connection
+    - url : String
+    - user : String
+    - password : String
+
+    - ConnectionInstantiator()
+    + static getInstance() : ConnectionInstantiator
+    + getConnection() : Connection
+    + closeConnection() : void
+  }
+
+  interface Connection
+}
+
+package "bank.factory" {
+
+  abstract class AccountFactory {
+    + createAccount(owner : Customer) : Account
+  }
+
+  class SavingsAccountFactory extends AccountFactory {
+    + createAccount(owner : Customer) : Account
+  }
+
+  class CheckingAccountFactory extends AccountFactory {
+    + createAccount(owner : Customer) : Account
+  }
+
+  class CheckingAccount implements Account
+  class SavingsAccount implements Account
+}
+
+package "bank.dao" {
+
+  class CustomerDao {
+    + create(customer : Customer) : Customer
+    + findAll() : List<Customer>
+    + findById(id : long) : Customer
+  }
+
+  class AccountDao {
+    + create(account : Account) : Account
+    + findAll() : List<Account>
+    + findById(accountNumber : String) : Account
+    + updateBalance(accountNumber : String, newBalance : BigDecimal) : void
+    + addOperation(accountNumber : String, operation : Operation) : void
+  }
+
+  class OperationDao {
+    + findByAccount(accountNumber : String) : List<Operation>
+    + create(accountNumber : String, operation : Operation) : Operation
+  }
+}
+
+package "bank.service" {
+
+  class BankingService {
+    + createCustomer(customer : Customer) : Customer
+    + getCustomer(id : long) : Customer
+    + getCustomers() : List<Customer
+
+    + createAccount(ownerId : long, type : String) : Account
+    + getAccount(accountNumber : String) : Account
+    + getAccounts() : List<Account>
+
+    + deposit(accountNumber : String, amount : BigDecimal) : void
+    + withdraw(accountNumber : String, amount : BigDecimal) : void
+    + transfer(fromAccount : String, toAccount : String, amount : BigDecimal) : void
+    + getOperations(accountNumber : String) : List<Operation>
+  }
+}
+
+package "bank.view" {
+  class ConsoleUI
+}
+
+package "bank.model" {
+
+  abstract class User {
+    - id : long
+    - firstName : String
+    - lastName : String
+    - email : String
+  }
+
+  class Customer extends User {
+    - phone : String
+    - address : String
+  }
+
+  enum OperationType {
+    DEPOSIT
+    WITHDRAWAL
+    TRANSFER
+  }
+
+  enum OperationStatus {
+    PENDING
+    SUCCESS
+    FAILED
+  }
+
+  class Operation {
+    - amount : BigDecimal
+    - type : OperationType
+    - status : OperationStatus
+    - date : Date
+  }
+
+  interface Account {
+    - accountNumber : String
+    - accountOwner : Customer
+    - balance : BigDecimal
+    - overdraftLimit : BigDecimal
+    - dailyWithdrawalLimit : BigDecimal
+  }
+}
+
+' =========================
+' Associations / Dependencies
+' =========================
+
+' Ownership + history
+Customer "1" -- "0..*" Account : owns >
+Account  "1" o-- "0..*" Operation : history >
+
+' Factories
+AccountFactory ..> Account : creates
+SavingsAccountFactory ..> SavingsAccount : instantiates
+CheckingAccountFactory ..> CheckingAccount : instantiates
+
+' DAOs use DB connection
+CustomerDao ..> ConnectionInstantiator : uses
+AccountDao  ..> ConnectionInstantiator : uses
+OperationDao ..> ConnectionInstantiator : uses
+
+' Service uses DAOs + factories
+BankingService ..> CustomerDao
+BankingService ..> AccountDao
+BankingService ..> OperationDao
+BankingService ..> AccountFactory
+
+' UI uses service
+ConsoleUI ..> BankingService
+
+@enduml
