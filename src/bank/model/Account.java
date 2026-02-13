@@ -28,4 +28,12 @@ public abstract class Account {
   public String getType (){
     return type;
   }
+
+  public Customer getAccountOwner() {
+    return null;
+  }
+
+  public Object getAccountNumber() {
+    return null;
+  }
 }
