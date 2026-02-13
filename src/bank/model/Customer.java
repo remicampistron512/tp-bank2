@@ -6,13 +6,17 @@ public class Customer {
   String lastName;
   String email;
   String phone;
+  String address;
 
-  public Customer(int id, String firstName, String lastName, String email, String phone) {
+
+
+  public Customer(int id, String firstName, String lastName, String email, String phone,String address) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.phone = phone;
+    this.address = address;
   }
 
   public int getId() {
@@ -55,7 +59,13 @@ public class Customer {
     this.phone = phone;
   }
 
+  public String getAddress() {
+    return address;
+  }
 
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
 
 }
