@@ -31,16 +31,7 @@ package "bank.factory" {
     + createAccount(owner : Customer) : Account
   }
 
-  class SavingsAccountFactory extends AccountFactory {
-    + createAccount(owner : Customer) : Account
-  }
 
-  class CheckingAccountFactory extends AccountFactory {
-    + createAccount(owner : Customer) : Account
-  }
-
-  class CheckingAccount implements Account
-  class SavingsAccount implements Account
 }
 
 package "bank.dao" {
@@ -139,8 +130,6 @@ Account  "1" o-- "0..*" Operation : history >
 
 ' Factories
 AccountFactory ..> Account : creates
-SavingsAccountFactory ..> SavingsAccount : instantiates
-CheckingAccountFactory ..> CheckingAccount : instantiates
 
 ' DAOs use DB connection
 CustomerDao ..> ConnectionInstantiator : uses
