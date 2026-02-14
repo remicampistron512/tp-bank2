@@ -78,7 +78,7 @@ public class CustomerDao {
 
   public Customer findById(int customerId) {
     String sql = """
-        SELECT cus_id, cus_first_name, cus_last_name
+        SELECT cus_id,cus_phone,cus_address,cus_first_name,cus_last_name,cus_email,cus_created_at
         FROM customer
         WHERE cus_id = ?
         """;

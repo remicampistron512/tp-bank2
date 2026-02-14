@@ -53,7 +53,7 @@ public class AccountDao {
         }
 
         cn.commit();
-        return AccountFactory.createAccount(type, (int) newAccountId, initialBalance);
+        return AccountFactory.createAccount(type, (int) newAccountId,accNumber,initialBalance,customer);
       }
 
     } catch (SQLException e) {
@@ -72,9 +72,10 @@ public class AccountDao {
   public List<Account> findAll() {
     // Multi-line SQL (text block) for readability
     String sql = """
-        SELECT acc_id,acc_number,acc_type,acc_owner_cus_id,acc_balance,acc_created_at,acc_interest_rate 
+        SELECT acc_id,acc_number,acc_type,acc_owner_cus_id,acc_balance,acc_overdraft_limit,
+        acc_daily_withdrawal_limit,acc_created_at,acc_interest_rate,acc_created_at
         FROM account
-        ORDER BY a.id
+        ORDER BY acc_id
         """;
 
     // Collection to store mapped accounts objects
@@ -106,7 +107,7 @@ public class AccountDao {
 
 
 
-        accounts.add(AccountFactory.createAccount(type, accountId, balance));
+        accounts.add(AccountFactory.createAccount(type, accountId,accountNumber, balance,customer));
       }
 
       // Return the full list
