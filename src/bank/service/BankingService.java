@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class BankingService {
-  public  Account createAccount(Customer customer,String type, BigDecimal initialBalance,BigDecimal interestRate){
+  public  Account createAccount(Customer customer,String accNumber, String type, BigDecimal initialBalance,BigDecimal interestRate){
     AccountDao accountDao = new AccountDao();
-    return accountDao.createAccount(customer,type,initialBalance,interestRate);
+    return accountDao.createAccount(customer,accNumber,type,initialBalance,interestRate);
   }
 
   // Customers
@@ -66,6 +66,5 @@ public class BankingService {
     return accountDao.transfer(amount,sourceAccount,targetAccount);
   }
 
-  public void createCustomer(String firstName, String lastName) {
-  }
+
 }

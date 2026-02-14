@@ -17,25 +17,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountDao {
-  public Account createAccount(Customer customer,String type, BigDecimal initialBalance,
-      BigDecimal interestRate) {
+  public Account createAccount(Customer customer, String accNumber, String type,
+      BigDecimal initialBalance, BigDecimal interestRate) {
 
-    String sqlAccount = "INSERT INTO account (acc_type, acc_owner_cus_id,acc_balance,acc_created_at,acc_interest_rate) VALUES (?,?,?,?,?)";
+    String sqlAccount = """
+    INSERT INTO account (acc_number, acc_type, acc_owner_cus_id, acc_balance, acc_interest_rate, acc_created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  """;
 
     Connection cn = null;
     try {
       cn = ConnectionInstantiator.getInstance().getConnection();
       cn.setAutoCommit(false);
 
+      try (PreparedStatement ps = cn.prepareStatement(sqlAccount, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-      try (PreparedStatement ps = cn.prepareStatement(sqlAccount)) {
-
-
-        ps.setString(1, type);
-        ps.setLong(2, customer.getId());                // <-- use customer.getId() (not getUserId) unless your model says otherwise
-        ps.setBigDecimal(3, initialBalance);
-        ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+        ps.setString(1, accNumber);
+        ps.setString(2, type);
+        ps.setLong(3, customer.getId());
+        ps.setBigDecimal(4, initialBalance);
         ps.setBigDecimal(5, interestRate);
+        ps.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
+
+        int rows = ps.executeUpdate();
+        if (rows != 1) {
+          throw new DaoException("Insert failed: no row inserted.");
+        }
 
         long newAccountId;
         try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -46,12 +53,8 @@ public class AccountDao {
         }
 
         cn.commit();
-
-
         return AccountFactory.createAccount(type, (int) newAccountId, initialBalance);
       }
-
-
 
     } catch (SQLException e) {
       if (cn != null) {
@@ -64,6 +67,7 @@ public class AccountDao {
       }
     }
   }
+
 
   public List<Account> findAll() {
     // Multi-line SQL (text block) for readability

@@ -179,7 +179,7 @@ public class ConsoleUi {
         return;
       } else {
         String accountName = generateAccountName();
-        openAccount(customersList.get(choice-1),type,initialBalance,interestRate);
+        openAccount(customersList.get(choice-1),accountName,type,initialBalance,interestRate);
       }
 
     }
@@ -194,9 +194,9 @@ public class ConsoleUi {
     return String.format("FR-%04d-%04d", part1, part2);
   }
 
-  private void openAccount(Customer customer,String type,BigDecimal initialBalance, BigDecimal interestRate) {
+  private void openAccount(Customer customer,String accNumber, String type,BigDecimal initialBalance, BigDecimal interestRate) {
     try {
-      service.createAccount(customer,type,initialBalance, interestRate);
+      service.createAccount(customer,accNumber,type,initialBalance, interestRate);
       System.out.printf("An account  for %s %s has been created",customer.getFirstName(),
           customer.getLastName());
     }  catch (DaoException e) {
@@ -272,7 +272,10 @@ public class ConsoleUi {
 
   private void createCustomer(String firstName,String lastName) {
     try {
-      service.createCustomer(firstName,lastName);
+      String phone = "000000";
+      String address = "rue de tartanpion";
+      String email = "test@test.com";
+      service.createCustomer(phone,address,firstName,lastName,email);
       System.out.print ("l'utilisateur " + firstName + " " +  lastName +" a été créé");
     }  catch (DaoException e) {
       System.out.println("Database error: " + e.getMessage());
